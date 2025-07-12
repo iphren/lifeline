@@ -41,7 +41,7 @@ fun WebViewScreen(url: String, modifier: Modifier = Modifier) {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                webViewClient = WebViewClient() // Ensures links open within the WebView
+                webViewClient = WebViewClient()
                 loadUrl(url)
             }
         },
