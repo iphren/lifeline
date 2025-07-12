@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,15 +17,33 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.peterchuministries.lifeline.ui.theme.LifeLineTheme
 
 class MainActivity : ComponentActivity() {
+    private var webView: WebView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (webView?.canGoBack() == true) {
+                    webView?.goBack()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        })
+
         setContent {
             LifeLineTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     WebViewScreen(
                         url = "https://d2t9pharo9r4eu.cloudfront.net/peter_chu/index.html",
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        onWebViewCreated = { createdWebView ->
+                            webView = createdWebView
+                        }
                     )
                 }
             }
@@ -33,7 +52,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun WebViewScreen(url: String, modifier: Modifier = Modifier) {
+fun WebViewScreen(
+    url: String,
+    modifier: Modifier = Modifier,
+    onWebViewCreated: (WebView) -> Unit
+) {
     AndroidView(
         factory = { context ->
             WebView(context).apply {
@@ -43,6 +66,7 @@ fun WebViewScreen(url: String, modifier: Modifier = Modifier) {
                 )
                 webViewClient = WebViewClient()
                 loadUrl(url)
+                onWebViewCreated(this)
             }
         },
         modifier = modifier.fillMaxSize()
