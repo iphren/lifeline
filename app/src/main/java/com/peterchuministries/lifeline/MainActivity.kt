@@ -1,16 +1,18 @@
 package com.peterchuministries.lifeline
 
 import android.os.Bundle
+import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.viewinterop.AndroidView
 import com.peterchuministries.lifeline.ui.theme.LifeLineTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,8 +22,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             LifeLineTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    WebViewScreen(
+                        url = "https://d2t9pharo9r4eu.cloudfront.net/peter_chu/index.html",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -31,17 +33,18 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun WebViewScreen(url: String, modifier: Modifier = Modifier) {
+    AndroidView(
+        factory = { context ->
+            WebView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                webViewClient = WebViewClient() // Ensures links open within the WebView
+                loadUrl(url)
+            }
+        },
+        modifier = modifier.fillMaxSize()
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LifeLineTheme {
-        Greeting("Android")
-    }
 }
